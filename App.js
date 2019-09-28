@@ -4,13 +4,14 @@ import Heading from './components/Heading'
 import Input from './components/Input'
 import Button from './components/Button'
 import TodoList from './components/TodoList'
+import TabBar from './components/TabBar'
 
 let todoIndex = 0;
 
 export default function App() {
   const [inputValue, setInputValue] = useState('');
   const [todos, setTodos] = useState([]);
-  const [type, setType] = useState('all');
+  const [type, setType] = useState('All');
 
   const addTodo = () => {
     if (inputValue.match(/^\s*$/)) {
@@ -19,7 +20,7 @@ export default function App() {
     }
     const todo = {
       title: inputValue,
-      todoIndex,
+      id: todoIndex,
       complete: false
     }
     todoIndex++;
@@ -27,14 +28,30 @@ export default function App() {
     setInputValue('')
   }
 
+  const completeTodo = (todoId) => {
+    let newTodos = todos;
+    newTodos.forEach(todo => {
+      if(todo.id === todoId) {
+        todo.complete = true;
+      }
+    });
+    setTodos(newTodos);
+  }
+
+  const deleteTodo = (todoId) => {
+    const newTodos = todos.filter(todo => todo.id !== todoId);
+    setTodos(newTodos);
+  }
+
   return (
     <View style={styles.container}>
       <ScrollView keyboardShouldPersistTabs="always" style={styles.content}>
         <Heading>Todos</Heading>
         <Input value={inputValue} handleChange={text => setInputValue(text) }/>
-        <TodoList todos={todos} />
-        <Button handleSubmit={addTodo}>Submit</Button>
+        <TodoList todos={todos} completeTodo={completeTodo} deleteTodo={deleteTodo} type={type} />
+        <Button handlePress={addTodo}>Submit</Button>
       </ScrollView>
+      <TabBar type={type} setType={setType} />
     </View>
   );
 }
